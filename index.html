@@ -9,14 +9,15 @@
     <div class="container">
         <h1>🌌 Sensory Describer</h1>
         <div class="controls">
-            <button onclick="generateDescription('nature')">Natureza</button>
-            <button onclick="generateDescription('objects')">Objetos</button>
-            <button onclick="generateDescription('memories')">Memórias</button>
+            <button onclick="generateNewDescription()">Novo</button>
+            <select id="voiceSelect" onchange="changeVoice()">
+                <option value="">Selecionar Voz</option>
+            </select>
         </div>
         <div id="display">
             <h2 id="sceneTitle"></h2>
             <p id="textDescription"></p>
-            <audio id="audioPlayer" controls></audio>
+            <audio id="audioPlayer" controls ontimeupdate="updateProgress()"></audio>
         </div>
     </div>
     <script src="app.js"></script>
