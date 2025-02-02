@@ -213,6 +213,7 @@
     let vozSelecionada = null;
     let synthesis = window.speechSynthesis;
     let utterance = null;
+    let reproduzindo = false;
     
     for (let i = 0; i < 50; i++) {
         titulos.push('Título ' + (i + 1));
@@ -220,7 +221,6 @@
     }
 
     let indiceAtual = 0;
-    let reproduzindo = false;
 
     // Restaurar índice do localStorage
     if (localStorage.getItem('ap-indiceAtual')) {
@@ -250,35 +250,57 @@
             option.textContent = `${voz.name} (${voz.lang})`;
             selectVozes.appendChild(option);
         });
+
+        // Se houver vozes disponíveis, seleciona a primeira por padrão
+        if (vozesDisponiveis.length > 0) {
+            vozSelecionada = vozesDisponiveis[0];
+            selectVozes.value = "0";
+        }
     }
 
-    synthesis.addEventListener('voiceschanged', carregarVozes);
+    // Garantir que as vozes sejam carregadas
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = carregarVozes;
+    }
     carregarVozes();
+
+    function criarUtterance(texto) {
+        const novoUtterance = new SpeechSynthesisUtterance(texto);
+        novoUtterance.rate = parseFloat(velocidade.value);
+        novoUtterance.voice = vozSelecionada;
+        
+        novoUtterance.onend = function() {
+            if (reproduzindo) {
+                setTimeout(function() {
+                    proximoTexto();
+                }, 1000);
+            }
+        };
+
+        return novoUtterance;
+    }
 
     selectVozes.addEventListener('change', function(e) {
         vozSelecionada = vozesDisponiveis[e.target.value];
+        
+        // Recriar o utterance com a nova voz se estiver reproduzindo
+        if (reproduzindo) {
+            synthesis.cancel();
+            utterance = criarUtterance(descricoes[indiceAtual]);
+            synthesis.speak(utterance);
+        } else {
+            utterance = criarUtterance(descricoes[indiceAtual]);
+        }
     });
 
     function carregarTexto(index) {
-        if (utterance) {
-            synthesis.cancel();
-        }
-
+        synthesis.cancel();
+        
         statusElem.textContent = (index + 1) + ' de 50';
         tituloElem.textContent = titulos[index];
         descricaoElem.textContent = descricoes[index];
         
-        utterance = new SpeechSynthesisUtterance(descricoes[index]);
-        utterance.rate = parseFloat(velocidade.value);
-        if (vozSelecionada) {
-            utterance.voice = vozSelecionada;
-        }
-        
-        utterance.onend = function() {
-            setTimeout(function() {
-                proximoTexto();
-            }, 1000);
-        };
+        utterance = criarUtterance(descricoes[index]);
     }
 
     function proximoTexto() {
@@ -307,6 +329,7 @@
     botaoAnterior.addEventListener('click', textoAnterior);
 
     botaoReproduzir.addEventListener('click', function() {
+        utterance = criarUtterance(descricoes[indiceAtual]);
         synthesis.speak(utterance);
         reproduzindo = true;
         atualizarBotoes();
@@ -344,9 +367,17 @@
 
     velocidade.addEventListener('input', function() {
         const velocidadeAtual = parseFloat(velocidade.value);
-        utterance.rate = velocidadeAtual;
         labelVelocidade.textContent = velocidadeAtual.toFixed(1);
         localStorage.setItem('ap-velocidadeReproducao', velocidadeAtual);
+
+        // Atualizar a velocidade em tempo real
+        if (reproduzindo) {
+            synthesis.cancel();
+            utterance = criarUtterance(descricoes[indiceAtual]);
+            synthesis.speak(utterance);
+        } else {
+            utterance = criarUtterance(descricoes[indiceAtual]);
+        }
     });
 
     carregarTexto(indiceAtual);
