@@ -1,3 +1,4 @@
+/* styles.css */
 body {
     font-family: Arial, sans-serif;
     background: #1a1a1a;
@@ -16,7 +17,7 @@ body {
     text-align: center;
 }
 
-button {
+button, select {
     background: #4CAF50;
     color: white;
     border: none;
@@ -24,6 +25,10 @@ button {
     margin: 5px;
     cursor: pointer;
     border-radius: 5px;
+}
+
+#voiceSelect {
+    background: #333;
 }
 
 #sceneTitle {
