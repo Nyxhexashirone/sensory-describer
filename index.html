@@ -182,13 +182,25 @@
     var speedLabel = document.getElementById('speed-label');
 
     function loadAudio(index) {
+        // Tente carregar o arquivo de áudio correspondente ao índice
         audio.src = index + '.mp3';
+        
+        // Verifique se o arquivo de áudio existe (simulação de verificação)
+        audio.onerror = function() {
+            console.error('Erro ao carregar o arquivo de áudio:', audio.src);
+            alert('O arquivo de áudio não pôde ser carregado. Verifique o caminho ou o arquivo.');
+        };
+    
+        audio.onloadstart = function() {
+            console.log('Arquivo de áudio carregado com sucesso:', audio.src);
+        };
+    
         audio.currentTime = 0;
         audio.playbackRate = parseFloat(speedRange.value);
         statusElem.textContent = (index + 1) + ' of 50';
         titleElem.textContent = titles[index];
         descriptionElem.textContent = descriptions[index];
-
+    
         audio.onended = function() {
             setTimeout(function() {
                 nextTrack();
