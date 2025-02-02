@@ -1,1 +1,24 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sensory Describer</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <h1>🌌 Sensory Describer</h1>
+        <div class="controls">
+            <button onclick="generateDescription('nature')">Natureza</button>
+            <button onclick="generateDescription('objects')">Objetos</button>
+            <button onclick="generateDescription('memories')">Memórias</button>
+        </div>
+        <div id="display">
+            <h2 id="sceneTitle"></h2>
+            <p id="textDescription"></p>
+            <audio id="audioPlayer" controls></audio>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
